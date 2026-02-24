@@ -1,6 +1,16 @@
 {
   "version": 1,
   "skills": {
+    "anthropics-frontend-design": {
+      "source": "smithery/ai",
+      "sourceType": "well-known",
+      "computedHash": "20272c29770acae46e2fe1531911fb06cc5521802bac0605a97146109e56cd4a"
+    },
+    "github-prd": {
+      "source": "smithery/ai",
+      "sourceType": "well-known",
+      "computedHash": "9e8718f0543cef2d4f0d501b0202182325851f9a2a71b7965032000a9729bf36"
+    },
     "github-refactor": {
       "source": "smithery/ai",
       "sourceType": "well-known",

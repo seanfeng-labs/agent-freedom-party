@@ -2,6 +2,7 @@
   "name": "ai-party",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "scripts": {
     "dev:server": "pnpm --filter @ai-party/server dev",
     "dev:web": "pnpm --filter @ai-party/web dev",
