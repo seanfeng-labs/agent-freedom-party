@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "tsdown --config tsdown.config.ts",
-    "dev": "pnpm run build && npx -y @modelcontextprotocol/inspector node dist/index.mjs"
+    "dev": "pnpm run build && node dist/index.mjs"
   },
   "dependencies": {
     "@ai-party/protocol": "workspace:*",
     "ws": "^8.19.0",
     "zod": "^3.24.1",
-    "@modelcontextprotocol/sdk": "^1.26.0"
+    "fastmcp": "^3.33.0"
   },
   "devDependencies": {
     "@types/ws": "^8.5.13"
