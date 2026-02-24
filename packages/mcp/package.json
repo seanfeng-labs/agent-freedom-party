@@ -1,0 +1,28 @@
+{
+  "name": "@ai-party/mcp",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown --config tsdown.config.ts",
+    "dev": "pnpm run build && npx -y @modelcontextprotocol/inspector node dist/index.mjs"
+  },
+  "dependencies": {
+    "@ai-party/protocol": "workspace:*",
+    "ws": "^8.19.0",
+    "zod": "^3.24.1",
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.cts"
+}

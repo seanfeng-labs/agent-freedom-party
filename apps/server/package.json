@@ -1,0 +1,36 @@
+{
+  "name": "@ai-party/server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsdown --config tsdown.config.ts",
+    "dev": "pnpm run build && node dist/index.cjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ai-party/protocol": "workspace:*",
+    "fastify": "^5.1.0",
+    "@fastify/cors": "^10.0.2",
+    "@fastify/websocket": "^11.0.1",
+    "tinyqueue": "^3.0.0",
+    "ai": "^4.3.0",
+    "@ai-sdk/deepseek": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13",
+    "vitest": "^2.1.0",
+    "ws": "^8.18.0"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.cts"
+}

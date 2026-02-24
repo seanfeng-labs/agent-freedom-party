@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "github-refactor": {
+      "source": "smithery/ai",
+      "sourceType": "well-known",
+      "computedHash": "40e9f84a09a080231d47ee4c93f4464d3799df85ff1b1e4c6a551af74ac8f808"
+    },
+    "libpdf-js-conventional-commit": {
+      "source": "smithery/ai",
+      "sourceType": "well-known",
+      "computedHash": "16455f5ced3a57062378a4610604122bed2ad343d70ee04898f7b327ce6cd502"
+    }
+  }
+}

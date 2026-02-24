@@ -1,0 +1,26 @@
+{
+  "name": "@ai-party/agents",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown --config tsdown.config.ts",
+    "dev": "export DEEPSEEK_API_KEY='sk-d929ca0add50439cb62e6aad919059a8' && pnpm run build && node dist/index.cjs"
+  },
+  "dependencies": {
+    "@ai-party/protocol": "workspace:*",
+    "@ai-party/mcp": "workspace:*",
+    "ai": "^6.0.97",
+    "@ai-sdk/deepseek": "^2.0.20",
+    "@ai-sdk/mcp": "^1.0.21"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.cts"
+}

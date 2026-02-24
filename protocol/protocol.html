@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Party Protocol · 架构图</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+    :root {
+      --bg: #080c14;
+      --surface: #0d1424;
+      --surface2: #111d35;
+      --border: rgba(99, 179, 255, 0.12);
+      --border-bright: rgba(99, 179, 255, 0.35);
+      --blue: #4da6ff;
+      --blue-dim: rgba(77, 166, 255, 0.15);
+      --cyan: #00e5ff;
+      --cyan-dim: rgba(0, 229, 255, 0.12);
+      --amber: #ffb347;
+      --amber-dim: rgba(255, 179, 71, 0.12);
+      --rose: #ff6b8a;
+      --rose-dim: rgba(255, 107, 138, 0.12);
+      --green: #4fffb0;
+      --green-dim: rgba(79, 255, 176, 0.1);
+      --purple: #c084fc;
+      --purple-dim: rgba(192, 132, 252, 0.1);
+      --text: #c8d8f0;
+      --text-dim: #5a7090;
+      --text-bright: #e8f2ff;
+    }
+
+    * {
+      font-family: 'Maple Mono CN', monospace;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === Background Grid === */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(77, 166, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(77, 166, 255, 0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 10%, rgba(77, 120, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .canvas {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 56px 32px 80px;
+    }
+
+    /* === Header === */
+    .header {
+      font-family: 'Maple Mono CN', monospace;
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--cyan);
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      background: rgba(0, 229, 255, 0.05);
+      text-transform: uppercase;
+    }
+
+    .header h1 {
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-bright);
+      line-height: 1.15;
+    }
+
+    .header h1 span {
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      background-clip: t;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-sub {
+      margin-top: 12px;
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+    }
+
+    /* === Section Titles === */
+    .section-label {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* === Cards === */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-bright);
+      box-shadow: 0 0 32px rgba(77, 166, 255, 0.06);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* === Roles Section === */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .roles-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .role-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: default;
+    }
+
+    .role-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .role-card.user::before {
+      background: linear-gradient(90deg, var(--amber), #ff9f43);
+    }
+
+    .role-card.host::before {
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+    }
+
+    .role-card.agent::before {
+      background: linear-gradient(90deg, var(--purple), #9b59b6);
+    }
+
+    .role-card.orch::before {
+      background: linear-gradient(90deg, var(--green), #00c896);
+    }
+
+    .role-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .role-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 4px;
+    }
+
+    .role-desc {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 10.5px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .role-badge {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 9px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .role-card.user .role-badge {
+      background: rgba(255, 179, 71, 0.15);
+      color: var(--amber);
+    }
+
+    .role-card.host .role-badge {
+      background: var(--blue-dim);
+      color: var(--blue);
+    }
+
+    .role-card.agent .role-badge {
+      background: var(--purple-dim);
+      color: var(--purple);
+    }
+
+    .role-card.orch .role-badge {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    /* === State Machine === */
+    .state-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .state-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 90px;
+      position: relative;
+      transition: all 0.25s;
+    }
+
+    .state-node:hover {
+      border-color: var(--border-bright);
+      background: var(--surface);
+    }
+
+    .state-node .state-name {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-bright);
+    }
+
+    .state-node .state-hint {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 9.5px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    .state-node.idle {
+      border-color: rgba(90, 112, 144, 0.4);
+    }
+
+    .state-node.active {
+      border-color: rgba(77, 166, 255, 0.4);
+      box-shadow: 0 0 16px rgba(77, 166, 255, 0.1);
+    }
+
+    .state-node.cooldown {
+      border-color: rgba(255, 179, 71, 0.35);
+    }
+
+    .state-node.closing {
+      border-color: rgba(192, 132, 252, 0.35);
+    }
+
+    .state-node.closed {
+      border-color: rgba(79, 255, 176, 0.3);
+    }
+
+    .state-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 8px;
+      gap: 2px;
+    }
+
+    .state-arrow .arrow-label {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 9px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      max-width: 70px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .state-arrow .arrow-line {
+      font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1;
+    }
+
+    /* === Core Flow === */
+    .flow-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 700px) {
+      .flow-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .flow-steps {
+      counter-reset: step;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      counter-increment: step;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--blue-dim);
+      border: 1px solid rgba(77, 166, 255, 0.3);
+      color: var(--blue);
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content .step-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 2px;
+    }
+
+    .step-content .step-code {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    .step-content .step-code em {
+      font-style: normal;
+      color: var(--cyan);
+    }
+
+    /* === Token Scoring === */
+    .score-formula {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 12.5px;
+      color: var(--text-bright);
+      line-height: 1.8;
+    }
+
+    .score-formula .term {
+      color: var(--blue);
+    }
+
+    .score-formula .op {
+      color: var(--text-dim);
+      margin: 0 4px;
+    }
+
+    .score-formula .val-high {
+      color: var(--green);
+    }
+
+    .score-formula .val-warn {
+      color: var(--amber);
+    }
+
+    .score-formula .val-neg {
+      color: var(--rose);
+    }
+
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11px;
+    }
+
+    .score-table th {
+      text-align: left;
+      padding: 7px 12px;
+      color: var(--text-dim);
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .score-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(99, 179, 255, 0.06);
+      color: var(--text);
+    }
+
+    .score-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    /* === Events Section === */
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 700px) {
+      .events-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .event-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 14px;
+      transition: all 0.2s;
+    }
+
+    .event-chip:hover {
+      border-color: var(--border-bright);
+      background: var(--surface);
+    }
+
+    .event-chip .event-type {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .event-chip .event-desc {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      line-height: 1.45;
+    }
+
+    .ec-user .event-type {
+      color: var(--amber);
+    }
+
+    .ec-orch .event-type {
+      color: var(--green);
+    }
+
+    .ec-agent .event-type {
+      color: var(--purple);
+    }
+
+    .ec-host .event-type {
+      color: var(--blue);
+    }
+
+    .ec-system .event-type {
+      color: var(--rose);
+    }
+
+    /* === Constraints === */
+    .constraints-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 700px) {
+      .constraints-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .constraint-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .constraint-icon {
+      font-size: 20px;
+    }
+
+    .constraint-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+
+    .constraint-val {
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    /* === Footer === */
+    .footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      font-family: 'Maple Mono CN', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .footer strong {
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    /* === Animations === */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .roles-grid,
+    .state-flow,
+    .flow-grid,
+    .events-grid,
+    .constraints-row {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .roles-grid {
+      animation-delay: 0.05s;
+    }
+
+    .state-flow {
+      animation-delay: 0.1s;
+    }
+
+    .flow-grid {
+      animation-delay: 0.15s;
+    }
+
+    .events-grid {
+      animation-delay: 0.2s;
+    }
+
+    .constraints-row {
+      animation-delay: 0.25s;
+    }
+
+    /* Pulse on active state */
+    @keyframes pulse-ring {
+      0% {
+        box-shadow: 0 0 0 0 rgba(77, 166, 255, 0.3);
+      }
+
+      70% {
+        box-shadow: 0 0 0 8px rgba(77, 166, 255, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(77, 166, 255, 0);
+      }
+    }
+
+    .state-node.active {
+      animation: pulse-ring 2.5s ease infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="canvas">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-badge">Architecture Overview v0.1</div>
+      <h1>Agent Party Protocol</h1>
+      <div class="header-sub">Event-Driven · Token-Controlled · Priority-Scheduled</div>
+    </div>
+
+    <!-- Roles -->
+    <div class="section-label">01 · 角色定义</div>
+    <div class="roles-grid">
+      <div class="role-card user">
+        <span class="role-icon">👤</span>
+        <div class="role-name">User</div>
+        <div class="role-desc">发起话题 / 点名<br>打断 / 收束</div>
+        <span class="role-badge">最高优先级</span>
+      </div>
+      <div class="role-card host">
+        <span class="role-icon">🎙</span>
+        <div class="role-name">Host Agent</div>
+        <div class="role-desc">主持讨论 / 子议题<br>收敛结论 / 总结</div>
+        <span class="role-badge">final_summary</span>
+      </div>
+      <div class="role-card agent">
+        <span class="role-icon">🤖</span>
+        <div class="role-name">Role Agent</div>
+        <div class="role-desc">专家 / 质疑者<br>落地官 等专业角色</div>
+        <span class="role-badge">raise_hand</span>
+      </div>
+      <div class="role-card orch">
+        <span class="role-icon">⚙️</span>
+        <div class="role-name">Orchestrator</div>
+        <div class="role-desc">举手队列 / 令牌分配<br>节流 / 公平调度</div>
+        <span class="role-badge">调度器</span>
+      </div>
+    </div>
+
+    <!-- State Machine -->
+    <div class="section-label">02 · 会话状态机</div>
+    <div class="state-flow">
+      <div class="state-node idle">
+        <div class="state-name">idle</div>
+        <div class="state-hint">未开题</div>
+      </div>
+      <div class="state-arrow">
+        <div class="arrow-label">topic_open</div>
+        <div class="arrow-line">→</div>
+      </div>
+      <div class="state-node active">
+        <div class="state-name">active</div>
+        <div class="state-hint">允许举手发言</div>
+      </div>
+      <div class="state-arrow">
+        <div class="arrow-label">速率超限</div>
+        <div class="arrow-line">⇌</div>
+      </div>
+      <div class="state-node cooldown">
+        <div class="state-name">cooldown</div>
+        <div class="state-hint">冷却防刷屏</div>
+      </div>
+      <div class="state-arrow">
+        <div class="arrow-label" style="color:var(--purple)">close_request</div>
+        <div class="arrow-line">→</div>
+      </div>
+      <div class="state-node closing">
+        <div class="state-name">closing</div>
+        <div class="state-hint">仅 Host 发言</div>
+      </div>
+      <div class="state-arrow">
+        <div class="arrow-label">final_summary</div>
+        <div class="arrow-line">→</div>
+      </div>
+      <div class="state-node closed">
+        <div class="state-name">closed</div>
+        <div class="state-hint">会话结束</div>
+      </div>
+    </div>
+
+    <!-- Core Flow + Token Scoring -->
+    <div class="section-label">03 · 核心流程 &amp; 令牌调度</div>
+    <div class="flow-grid">
+      <!-- Steps -->
+      <div class="card">
+        <div class="card-title">
+          <div class="dot" style="background:var(--blue)"></div>
+          发言全流程
+        </div>
+        <div style="margin-top:14px" class="flow-steps">
+          <div class="flow-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">用户开题</div>
+              <div class="step-code"><em>topic_open</em> → session.state = active</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">Agent 举手</div>
+              <div class="step-code"><em>raise_hand</em> { intent, priority, reason_code }</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">调度器评分放行</div>
+              <div class="step-code"><em>hand_accepted</em> { token_id, ttl_sec }</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">持令牌发言</div>
+              <div class="step-code"><em>speak</em> → 验证 token_id · holder · 未过期</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">5</div>
+            <div class="step-content">
+              <div class="step-title">释放令牌</div>
+              <div class="step-code"><em>yield_token</em> 或 TTL 超时自动回收</div>
+            </div>
+          </div>
+          <div class="flow-step">
+            <div class="step-num">6</div>
+            <div class="step-content">
+              <div class="step-title">收束总结</div>
+              <div class="step-code"><em>close_request</em> → <em>final_summary</em></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring -->
+      <div class="card">
+        <div class="card-title">
+          <div class="dot" style="background:var(--green)"></div>
+          优先队列评分公式
+        </div>
+        <div class="score-formula" style="margin-top:14px">
+          <span class="term">score</span><span class="op">=</span>
+          <span class="term">priority_weight</span>
+          <span class="op">+</span><span class="term">wait_bonus</span>
+          <span class="op">+</span><span class="term">mention_bonus</span>
+          <span class="op">−</span><span class="term" style="color:var(--rose)">dominance_penalty</span>
+        </div>
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>项目</th>
+              <th>值</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>priority high</td>
+              <td><span class="pill" style="background:rgba(79,255,176,0.15);color:var(--green)">+100</span></td>
+              <td style="color:var(--text-dim)">紧急风险</td>
+            </tr>
+            <tr>
+              <td>priority medium</td>
+              <td><span class="pill" style="background:var(--blue-dim);color:var(--blue)">+60</span></td>
+              <td style="color:var(--text-dim)">默认</td>
+            </tr>
+            <tr>
+              <td>priority low</td>
+              <td><span class="pill" style="background:rgba(90,112,144,0.2);color:var(--text-dim)">+30</span></td>
+              <td style="color:var(--text-dim)">补充</td>
+            </tr>
+            <tr>
+              <td>wait_bonus</td>
+              <td><span class="pill" style="background:var(--cyan-dim);color:var(--cyan)">+1/s</span></td>
+              <td style="color:var(--text-dim)">上限 30</td>
+            </tr>
+            <tr>
+              <td>user 点名</td>
+              <td><span class="pill" style="background:var(--amber-dim);color:var(--amber)">+40</span></td>
+              <td style="color:var(--text-dim)">retarget</td>
+            </tr>
+            <tr>
+              <td>Agent @ 提及</td>
+              <td><span class="pill" style="background:var(--purple-dim);color:var(--purple)">+15</span></td>
+              <td style="color:var(--text-dim)">reply_to</td>
+            </tr>
+            <tr>
+              <td>dominance_penalty</td>
+              <td><span class="pill" style="background:rgba(255,107,138,0.1);color:var(--rose)">−20~60</span></td>
+              <td style="color:var(--text-dim)">60s 内发言多</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div class="section-label">04 · 关键事件类型</div>
+    <div class="events-grid">
+      <div class="event-chip ec-user">
+        <div class="event-type">topic_open</div>
+        <div class="event-desc">用户开题，携带 topic 字段，触发 idle→active</div>
+      </div>
+      <div class="event-chip ec-agent">
+        <div class="event-type">raise_hand</div>
+        <div class="event-desc">Agent 请求发言，附 intent / priority / reason_code</div>
+      </div>
+      <div class="event-chip ec-orch">
+        <div class="event-type">hand_accepted</div>
+        <div class="event-desc">调度器放行，分配 token_id 与 ttl_sec</div>
+      </div>
+      <div class="event-chip ec-orch">
+        <div class="event-type">hand_rejected</div>
+        <div class="event-desc">拒绝举手；reason: 重复 / 离题 / 限流 / closing</div>
+      </div>
+      <div class="event-chip ec-agent">
+        <div class="event-type">speak</div>
+        <div class="event-desc">正式发言，验证 token_id · holder · 未过期</div>
+      </div>
+      <div class="event-chip ec-agent">
+        <div class="event-type">yield_token</div>
+        <div class="event-desc">主动结束发言，立即释放令牌进入下一排队</div>
+      </div>
+      <div class="event-chip ec-system">
+        <div class="event-type">interrupt_request</div>
+        <div class="event-desc">请求打断，用于纠错或高风险场景</div>
+      </div>
+      <div class="event-chip ec-user">
+        <div class="event-type">user_message</div>
+        <div class="event-desc">用户插话，自动最高优先级，无需举手</div>
+      </div>
+      <div class="event-chip ec-user">
+        <div class="event-type">retarget</div>
+        <div class="event-desc">点名指定某 Agent 发言，mention_bonus +40</div>
+      </div>
+      <div class="event-chip ec-user">
+        <div class="event-type">close_request</div>
+        <div class="event-desc">发起收束，active→closing，仅 Host 可发言</div>
+      </div>
+      <div class="event-chip ec-host">
+        <div class="event-type">final_summary</div>
+        <div class="event-desc">主持输出结论 / 分歧 / 行动项，触发 closing→closed</div>
+      </div>
+      <div class="event-chip ec-system">
+        <div class="event-type">interrupt_granted</div>
+        <div class="event-desc">打断获准，抢占令牌，当前持有者被强制 yield</div>
+      </div>
+    </div>
+
+    <!-- Constraints -->
+    <div class="section-label">05 · 约束 &amp; 可配置参数</div>
+    <div class="constraints-row">
+      <div class="constraint-item">
+        <div class="constraint-icon">🔁</div>
+        <div class="constraint-name">去重合并</div>
+        <div class="constraint-val">相同 reason_code<br>短时重复举手合并</div>
+      </div>
+      <div class="constraint-item">
+        <div class="constraint-icon">🎯</div>
+        <div class="constraint-name">离题检测</div>
+        <div class="constraint-val">超阈值拒绝<br>提示关联主问题</div>
+      </div>
+      <div class="constraint-item">
+        <div class="constraint-icon">🚦</div>
+        <div class="constraint-name">节流限速</div>
+        <div class="constraint-val">单 Agent<br>≤ 3次/分钟</div>
+      </div>
+      <div class="constraint-item">
+        <div class="constraint-icon">🔒</div>
+        <div class="constraint-name">安全降级</div>
+        <div class="constraint-val">敏感内容→<br>仅 Host 总结</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <strong>Agent Party Protocol</strong> · MVP · single-token mode · event-driven + priority-scheduled
+    </div>
+
+  </div>
+</body>
+
+</html>

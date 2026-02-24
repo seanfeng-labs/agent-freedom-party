@@ -1,0 +1,25 @@
+{
+  "name": "@ai-party/protocol",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsdown --config tsdown.config.ts",
+    "dev": "pnpm run build -- --watch"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.cts"
+}

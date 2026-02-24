@@ -1,0 +1,17 @@
+{
+  "name": "ai-party",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:server": "pnpm --filter @ai-party/server dev",
+    "dev:web": "pnpm --filter @ai-party/web dev",
+    "build": "pnpm -r --filter '!@ai-party/web' build",
+    "build:web": "pnpm --filter @ai-party/web build",
+    "protocol": "open -a 'Google Chrome' protocol/protocol.html"
+  },
+  "devDependencies": {
+    "tsdown": "^0.20.3",
+    "@types/node": "^25.0.3",
+    "typescript": "^5.9.3"
+  }
+}
